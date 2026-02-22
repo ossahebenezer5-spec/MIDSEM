@@ -1,0 +1,125 @@
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <iomanip>
+
+using namespace std;
+
+class Student {
+public:
+    string name;
+    string id;
+    int totalClasses = 0;
+    int attendedClasses = 0;
+
+    void markAttendance(bool present) {
+        totalClasses++;
+        if (present) {
+            attendedClasses++;
+        }
+    }
+
+    double getAttendancePercentage() const {
+        if (totalClasses == 0) return 0;
+        return (double(attendedClasses) / totalClasses) * 100;
+    }
+};
+
+vector<Student> students;
+
+// Function to add student
+void addStudent() {
+    Student s;
+    cout << "Enter Student Name: ";
+    cin.ignore();
+    getline(cin, s.name);
+
+    cout << "Enter Student ID: ";
+    getline(cin, s.id);
+
+    students.push_back(s);
+    cout << "Student added successfully!\n";
+}
+
+// Function to mark attendance
+void markAttendance() {
+    if (students.empty()) {
+        cout << "No students available.\n";
+        return;
+    }
+
+    cout << "\nMark Attendance (P = Present, A = Absent)\n";
+    for (auto &s : students) {
+        char status;
+        cout << "Is " << s.name << " present? (P/A): ";
+        cin >> status;
+
+        if (status == 'P' || status == 'p')
+            s.markAttendance(true);
+        else
+            s.markAttendance(false);
+    }
+
+    cout << "Attendance recorded successfully!\n";
+}
+
+// Function to display attendance
+void displayAttendance() {
+    cout << "\nAttendance Summary:\n";
+    cout << left << setw(20) << "Name"
+         << setw(10) << "ID"
+         << setw(15) << "Total"
+         << setw(15) << "Attended"
+         << setw(10) << "Percent\n";
+
+    for (const auto &s : students) {
+        cout << left << setw(20) << s.name
+             << setw(10) << s.id
+             << setw(15) << s.totalClasses
+             << setw(15) << s.attendedClasses
+             << setw(10) << fixed << setprecision(2)
+             << s.getAttendancePercentage() << "%\n";
+    }
+}
+
+// Save to file
+void saveToFile() {
+    ofstream file("attendance.txt");
+
+    for (const auto &s : students) {
+        file << s.name << ","
+             << s.id << ","
+             << s.totalClasses << ","
+             << s.attendedClasses << endl;
+    }
+
+    file.close();
+    cout << "Data saved to attendance.txt\n";
+}
+
+int main() {
+    int choice;
+
+    do {
+        cout << "\n===== Digital Attendance System =====\n";
+        cout << "1. Add Student\n";
+        cout << "2. Mark Attendance\n";
+        cout << "3. Display Attendance Summary\n";
+        cout << "4. Save to File\n";
+        cout << "5. Exit\n";
+        cout << "Enter choice: ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1: addStudent(); break;
+            case 2: markAttendance(); break;
+            case 3: displayAttendance(); break;
+            case 4: saveToFile(); break;
+            case 5: cout << "Exiting program...\n"; break;
+            default: cout << "Invalid choice.\n";
+        }
+
+    } while (choice != 5);
+
+    return 0;
+}
