@@ -84,3 +84,46 @@ void displayAttendance() {
     }
 }
 
+//week 4
+// Save to file
+void saveToFile() {
+    ofstream file("attendance.txt");
+
+    for (const auto &s : students) {
+        file << s.name << ","
+             << s.id << ","
+             << s.totalClasses << ","
+             << s.attendedClasses << endl;
+    }
+
+    file.close();
+    cout << "Data saved to attendance.txt\n";
+}
+
+int main() {
+    int choice;
+
+    do {
+        cout << "\n===== Digital Attendance System =====\n";
+        cout << "1. Add Student\n";
+        cout << "2. Mark Attendance\n";
+        cout << "3. Display Attendance Summary\n";
+        cout << "4. Save to File\n";
+        cout << "5. Exit\n";
+        cout << "Enter choice: ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1: addStudent(); break;
+            case 2: markAttendance(); break;
+            case 3: displayAttendance(); break;
+            case 4: saveToFile(); break;
+            case 5: cout << "Exiting program...\n"; break;
+            default: cout << "Invalid choice.\n";
+        }
+
+    } while (choice != 5);
+
+    return 0;
+}
+
