@@ -24,3 +24,27 @@ public:
         return (double(attendedClasses) / totalClasses) * 100;
     }
 };
+
+//week 2
+vector<Student> students;
+
+// Function to add student
+void addStudent() {
+    Student s;
+    cout << "Enter Student Name: ";
+    cin.ignore();
+    getline(cin, s.name);
+
+    cout << "Enter Student ID: ";
+    getline(cin, s.id);
+
+    students.push_back(s);
+    cout << "Student added successfully!\n";
+}
+
+// Function to mark attendance
+void markAttendance() {
+    if (students.empty()) {
+        cout << "No students available.\n";
+        return;
+    }
