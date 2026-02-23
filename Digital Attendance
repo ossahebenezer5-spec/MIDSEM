@@ -48,3 +48,39 @@ void markAttendance() {
         cout << "No students available.\n";
         return;
     }
+
+//week 3
+    cout << "\nMark Attendance (P = Present, A = Absent)\n";
+    for (auto &s : students) {
+        char status;
+        cout << "Is " << s.name << " present? (P/A): ";
+        cin >> status;
+
+        if (status == 'P' || status == 'p')
+            s.markAttendance(true);
+        else
+            s.markAttendance(false);
+    }
+
+    cout << "Attendance recorded successfully!\n";
+}
+
+// Function to display attendance
+void displayAttendance() {
+    cout << "\nAttendance Summary:\n";
+    cout << left << setw(20) << "Name"
+         << setw(10) << "ID"
+         << setw(15) << "Total"
+         << setw(15) << "Attended"
+         << setw(10) << "Percent\n";
+
+    for (const auto &s : students) {
+        cout << left << setw(20) << s.name
+             << setw(10) << s.id
+             << setw(15) << s.totalClasses
+             << setw(15) << s.attendedClasses
+             << setw(10) << fixed << setprecision(2)
+             << s.getAttendancePercentage() << "%\n";
+    }
+}
+
