@@ -1,71 +1,74 @@
 #include <iostream>
-#include <vector>
+#include <fstream>
 #include <string>
+#include <vector>
+#include <iomanip>
+
 using namespace std;
 
+// Class to represent a Student
 class Student {
 public:
+    string id;
     string name;
-    int id;
-    int attendanceCount;
+    bool isPresent;
 
-    Student(string n, int i) {
-        name = n;
-        id = i;
-        attendanceCount = 0;
-    }
+    Student(string id, string name) : id(id), name(name), isPresent(false) {}
 };
 
+// System Controller
 class AttendanceSystem {
 private:
-    vector<Student> students;
+    vector<Student> classList;
+    string filename = "attendance_records.txt";
 
 public:
-    void addStudent() {
-        string name;
-        int id;
-
-        cout << "Enter Student Name: ";
-        cin.ignore();
-        getline(cin, name);
-
-        cout << "Enter Student ID: ";
-        cin >> id;
-
-        students.push_back(Student(name, id));
-        cout << "Student added successfully!\n";
+    // Pre-populate with some students for the demo
+    AttendanceSystem() {
+        classList.push_back(Student("S101", "Alice Benson"));
+        classList.push_back(Student("S102", "Bob Smith"));
+        classList.push_back(Student("S103", "Charles Aboagye"));
+        classList.push_back(Student("S104", "Daisy Miller Brown"));
     }
 
-    void markAttendance() {
-        int id;
-        cout << "Enter Student ID to mark attendance: ";
-        cin >> id;
+    void takeAttendance() {
+        cout << "\n--- Taking Attendance ---" << endl;
+        for (auto &student : classList) {
+            char choice;
+            cout << "Is " << student.name << " (" << student.id << ") present? (y/n): ";
+            cin >> choice;
+            student.isPresent = (choice == 'y' || choice == 'C');
+        }
+        saveToFile();
+        cout << "Attendance recorded and saved successfully!\n";
+    }
 
-        for (auto &student : students) {
-            if (student.id == id) {
-                student.attendanceCount++;
-                cout << "Attendance marked for " << student.name << endl;
-                return;
+    void saveToFile() {
+        ofstream outFile(filename, ios::app); // Open in append mode
+        if (outFile.is_open()) {
+            outFile << "--- Attendance Session ---\n";
+            for (const auto &student : classList) {
+                outFile << student.id << " | " << setw(15) << left << student.name 
+                        << " | Status: " << (student.isPresent ? "Present" : "Absent") << endl;
             }
-        }
-
-        cout << "Student not found!\n";
-    }
-
-    void viewStudents() {
-        cout << "\n--- Student List ---\n";
-        for (auto student : students) {
-            cout << "Name: " << student.name
-                 << ", ID: " << student.id
-                 << ", Attendance: " << student.attendanceCount << endl;
+            outFile << "--------------------------\n\n";
+            outFile.close();
+        } else {
+            cerr << "Error: Could not open file for saving." << endl;
         }
     }
 
-    void attendanceSummary() {
-        cout << "\n--- Attendance Summary ---\n";
-        for (auto student : students) {
-            cout << student.name << " attended "
-                 << student.attendanceCount << " classes.\n";
+    void viewSummary() {
+        ifstream inFile(filename);
+        string line;
+        cout << "\n--- Historical Attendance Summary ---\n";
+        if (inFile.is_open()) {
+            while (getline(inFile, line)) {
+                cout << line << endl;
+            }
+            inFile.close();
+        } else {
+            cout << "No records found. Take attendance first." << endl;
         }
     }
 };
@@ -75,36 +78,20 @@ int main() {
     int choice;
 
     do {
-        cout << "\n===== DIGITAL ATTENDANCE SYSTEM =====\n";
-        cout << "1. Add Student\n";
-        cout << "2. Mark Attendance\n";
-        cout << "3. View Students\n";
-        cout << "4. Attendance Summary\n";
-        cout << "5. Exit\n";
-        cout << "Enter your choice: ";
+        cout << "\nDigital Attendance System";
+        cout << "\n1. Take Attendance";
+        cout << "\n2. View Attendance Summary";
+        cout << "\n3. Exit";
+        cout << "\nEnter choice: ";
         cin >> choice;
 
         switch (choice) {
-        case 1:
-            system.addStudent();
-            break;
-        case 2:
-            system.markAttendance();
-            break;
-        case 3:
-            system.viewStudents();
-            break;
-        case 4:
-            system.attendanceSummary();
-            break;
-        case 5:
-            cout << "Exiting system...\n";
-            break;
-        default:
-            cout << "Invalid choice!\n";
+            case 1: system.takeAttendance(); break;
+            case 2: system.viewSummary(); break;
+            case 3: cout << "Exiting system..." << endl; break;
+            default: cout << "Invalid choice!" << endl;
         }
-
-    } while (choice != 5);
+    } while (choice != 3);
 
     return 0;
 }
