@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <iomanip>
+#include <ctime> // For timestamping records
 
 using namespace std;
 
@@ -22,53 +23,81 @@ private:
     vector<Student> classList;
     string filename = "attendance_records.txt";
 
+    // Helper function to get current date/time as a string
+    string getCurrentTimestamp() {
+        time_t now = time(0);
+        char buf[80];
+        struct tm tstruct = *localtime(&now);
+        strftime(buf, sizeof(buf), "%Y-%m-%d %X", &tstruct);
+        return string(buf);
+    }
+
 public:
-    // Pre-populate with some students for the demo
     AttendanceSystem() {
-        classList.push_back(Student("S101", "Alice Benson"));
+        // Pre-populating class list as per assignment scope
+        classList.push_back(Student("S101", "Alice Johnson"));
         classList.push_back(Student("S102", "Bob Smith"));
-        classList.push_back(Student("S103", "Charles Aboagye"));
-        classList.push_back(Student("S104", "Daisy Miller Brown"));
+        classList.push_back(Student("S103", "Charlie Brown"));
+        classList.push_back(Student("S104", "Daisy Miller"));
     }
 
     void takeAttendance() {
-        cout << "\n--- Taking Attendance ---" << endl;
+        cout << "\n--- Attendance Session: " << getCurrentTimestamp() << " ---" << endl;
+        
         for (auto &student : classList) {
             char choice;
-            cout << "Is " << student.name << " (" << student.id << ") present? (y/n): ";
-            cin >> choice;
-            student.isPresent = (choice == 'y' || choice == 'C');
+            bool valid = false;
+
+            while (!valid) {
+                cout << "Is " << student.name << " (" << student.id << ") present? (y/n): ";
+                cin >> choice;
+
+                if (tolower(choice) == 'y' || tolower(choice) == 'n') {
+                    student.isPresent = (tolower(choice) == 'y');
+                    valid = true;
+                } else {
+                    cout << "Invalid input. Please enter 'y' for present or 'n' for absent." << endl;
+                }
+                
+                // Clear the buffer to prevent "ghost" inputs if user types "yes"
+                cin.ignore(1000, '\n');
+            }
         }
         saveToFile();
-        cout << "Attendance recorded and saved successfully!\n";
+        cout << "\nAttendance recorded and saved to " << filename << endl;
     }
 
     void saveToFile() {
-        ofstream outFile(filename, ios::app); // Open in append mode
+        ofstream outFile(filename, ios::app); 
         if (outFile.is_open()) {
-            outFile << "--- Attendance Session ---\n";
+            outFile << "Session Date/Time: " << getCurrentTimestamp() << "\n";
+            outFile << "--------------------------------------------------\n";
+            outFile << left << setw(10) << "ID" << setw(20) << "Name" << "Status\n";
+            outFile << "--------------------------------------------------\n";
+            
             for (const auto &student : classList) {
-                outFile << student.id << " | " << setw(15) << left << student.name 
-                        << " | Status: " << (student.isPresent ? "Present" : "Absent") << endl;
+                outFile << left << setw(10) << student.id 
+                        << setw(20) << student.name 
+                        << (student.isPresent ? "Present" : "Absent") << endl;
             }
-            outFile << "--------------------------\n\n";
+            outFile << "--------------------------------------------------\n\n";
             outFile.close();
         } else {
-            cerr << "Error: Could not open file for saving." << endl;
+            cerr << "Critical Error: Could not open record file." << endl;
         }
     }
 
     void viewSummary() {
         ifstream inFile(filename);
         string line;
-        cout << "\n--- Historical Attendance Summary ---\n";
+        cout << "\n--- Historical Attendance Records ---\n";
         if (inFile.is_open()) {
             while (getline(inFile, line)) {
                 cout << line << endl;
             }
             inFile.close();
         } else {
-            cout << "No records found. Take attendance first." << endl;
+            cout << "No records found. Please conduct a session first." << endl;
         }
     }
 };
@@ -77,21 +106,33 @@ int main() {
     AttendanceSystem system;
     int choice;
 
-    do {
-        cout << "\nDigital Attendance System";
-        cout << "\n1. Take Attendance";
-        cout << "\n2. View Attendance Summary";
-        cout << "\n3. Exit";
-        cout << "\nEnter choice: ";
-        cin >> choice;
+    while (true) {
+        cout << "\n===============================";
+        cout << "\n   DIGITAL ATTENDANCE SYSTEM";
+        cout << "\n===============================";
+        cout << "\n1. Take New Attendance";
+        cout << "\n2. View All Saved Summaries";
+        cout << "\n3. Exit System";
+        cout << "\nChoose an option: ";
 
-        switch (choice) {
-            case 1: system.takeAttendance(); break;
-            case 2: system.viewSummary(); break;
-            case 3: cout << "Exiting system..." << endl; break;
-            default: cout << "Invalid choice!" << endl;
+        if (!(cin >> choice)) {
+            cout << "Invalid input! Please enter a number (1-3)." << endl;
+            cin.clear();
+            cin.ignore(1000, '\n');
+            continue;
         }
-    } while (choice != 3);
+
+        if (choice == 1) {
+            system.takeAttendance();
+        } else if (choice == 2) {
+            system.viewSummary();
+        } else if (choice == 3) {
+            cout << "System shutting down. Goodbye!" << endl;
+            break;
+        } else {
+            cout << "Selection out of range." << endl;
+        }
+    }
 
     return 0;
 }
