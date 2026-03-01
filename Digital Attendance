@@ -35,10 +35,10 @@ private:
 public:
     AttendanceSystem() {
         // Pre-populating class list as per assignment scope
-        classList.push_back(Student("S101", "Alice Johnson"));
-        classList.push_back(Student("S102", "Bob Smith"));
-        classList.push_back(Student("S103", "Charlie Brown"));
-        classList.push_back(Student("S104", "Daisy Miller"));
+        classList.push_back(Student("S101", "Kofi Manu"));
+        classList.push_back(Student("S102", "Bobby Brown"));
+        classList.push_back(Student("S103", "Charles Osei"));
+        classList.push_back(Student("S104", "Mike Owusu"));
     }
 
     void takeAttendance() {
